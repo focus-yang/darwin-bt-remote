@@ -18,7 +18,8 @@ struct RemoteView: View {
     }
 
     private var controls: some View {
-        HStack(spacing: 18) {
+        HStack(spacing: 8) {
+
             oceanButton(
                 key: .menuLeft,
                 icon: "chevron.left",
@@ -37,7 +38,7 @@ struct RemoteView: View {
                 title: "下一页"
             )
         }
-        .padding(24)
+        .padding(10)
     }
 
     private func oceanButton(
@@ -45,6 +46,7 @@ struct RemoteView: View {
         icon: String,
         title: String
     ) -> some View {
+
         HoldButton(
             onPress: {
                 hid.sendConsumer(
@@ -55,16 +57,22 @@ struct RemoteView: View {
                 hid.sendConsumer(.zero)
             },
             background: {
-                RoundedRectangle(cornerRadius: 28)
+                RoundedRectangle(cornerRadius: 14)
                     .fill(groupFill)
             },
             label: {
-                VStack(spacing: 16) {
+                VStack(spacing: 5) {
+
                     Image(systemName: icon)
-                        .font(.system(size: 44, weight: .semibold))
+                        .font(
+                            .system(
+                                size: 25,
+                                weight: .semibold
+                            )
+                        )
 
                     Text(title)
-                        .font(.title2.weight(.medium))
+                        .font(.caption)
                 }
                 .frame(
                     maxWidth: .infinity,
@@ -81,7 +89,7 @@ struct RemoteView: View {
 }
 
 #if DEBUG
-    #Preview {
-        RemoteView(goToSetup: {})
-    }
+#Preview {
+    RemoteView(goToSetup: {})
+}
 #endif
