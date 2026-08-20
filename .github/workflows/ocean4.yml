@@ -1,0 +1,66 @@
+name: Build Ocean4 Remote
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      - name: Download source
+        uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: |
+          sudo xcode-select -s /Applications/Xcode_26.3.app
+          xcodebuild -version
+
+      - name: Prepare project
+        env:
+          CI_PRIMARY_REPOSITORY_PATH: ${{ github.workspace }}
+        run: |
+          chmod +x ci_scripts/ci_post_clone.sh
+          ci_scripts/ci_post_clone.sh
+
+      - name: Build macOS app
+        run: |
+          xcodebuild \
+            -project BTRemote.xcodeproj \
+            -scheme BTRemote \
+            -configuration Release \
+            -destination "platform=macOS" \
+            -derivedDataPath .build/DerivedData \
+            CODE_SIGNING_ALLOWED=NO \
+            PRODUCT_BUNDLE_IDENTIFIER=com.local.ocean4remote \
+            build
+
+      - name: Sign locally
+        run: |
+          codesign \
+            --force \
+            --sign - \
+            --entitlements BTRemote/entitlements.plist \
+            .build/DerivedData/Build/Products/Release/BTRemote.app
+
+          codesign \
+            --verify \
+            --deep \
+            --strict \
+            .build/DerivedData/Build/Products/Release/BTRemote.app
+
+      - name: Package
+        run: |
+          ditto \
+            -c \
+            -k \
+            --sequesterRsrc \
+            --keepParent \
+            .build/DerivedData/Build/Products/Release/BTRemote.app \
+            Ocean4Remote-app.zip
+
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: Ocean4Remote-build
+          path: Ocean4Remote-app.zip
