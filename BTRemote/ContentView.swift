@@ -55,7 +55,7 @@ struct ContentView: View {
             }
             .sheet(isPresented: $showGuide) { guideSheet }
         #if os(macOS)
-            .frame(minWidth: 480, idealWidth: 560, minHeight: 640, idealHeight: 800)
+            .frame(minWidth: 330, idealWidth: 330, minHeight: 160, idealHeight: 190)
             .onChange(of: directInput.needsAccessibility) { needs in
                 guard needs else { return }
                 showAccessibilityPrompt = true
